@@ -1,4 +1,5 @@
-import './App.css';
+import { useEffect, useRef } from 'react';
+import './App.scss';
 
 const unsplashUrls = [
   'https://images.unsplash.com/photo-1529971071135-c1982792bb96?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80',
@@ -11,8 +12,30 @@ const unsplashUrls = [
 ];
 
 function App() {
+  const slider = useRef();
+
+  const mouseDown = () => {};
+  const mouseLeave = () => {};
+  const mouseUp = () => {};
+  const mouseMove = () => {};
+
+  useEffect(() => {
+    const sliderCopy = slider.current;
+    sliderCopy.addEventListener('mousedown', mouseDown);
+    sliderCopy.addEventListener('mouseleave', mouseLeave);
+    sliderCopy.addEventListener('mouseup', mouseUp);
+    sliderCopy.addEventListener('mousemove', mouseMove);
+
+    return () => {
+      sliderCopy.removeEventListener('mousedown', mouseDown);
+      sliderCopy.removeEventListener('mouseleave', mouseLeave);
+      sliderCopy.removeEventListener('mouseup', mouseUp);
+      sliderCopy.removeEventListener('mousemove', mouseMove);
+    };
+  }, []);
+
   return (
-    <div className="family">
+    <div className="family" ref={slider}>
       {unsplashUrls.map((url) => (
         <div className="family-item">
           <div
