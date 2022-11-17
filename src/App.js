@@ -37,6 +37,7 @@ function App() {
   };
   const mouseUp = () => {
     stateRef.current.hasMousePress = false;
+    beginMomentumTracking();
   };
   const mouseMove = (event) => {
     if (!stateRef.current.hasMousePress) return;
@@ -52,6 +53,33 @@ function App() {
       stateRef.current.transformAmount - clampedDistance;
     stateRef.current.transformAmount = clampedDistance;
     slider.current.style.transform = `translate3d(${clampedDistance}px, 0px, 0px)`;
+  };
+
+  const beginMomentumTracking = () => {
+    cancelMomentumTracking();
+    stateRef.current.requestAnimationId =
+      requestAnimationFrame(momentumLoop);
+  };
+  const cancelMomentumTracking = () => {
+    cancelAnimationFrame(stateRef.current.requestAnimationId);
+  };
+
+  const momentumLoop = () => {
+    const value =
+      stateRef.current.transformAmount - stateRef.current.velocity;
+    const clampedDistance = clamp(
+      value,
+      -slider.current.scrollWidth + slider.current.clientWidth,
+      0
+    );
+    stateRef.current.transformAmount = clampedDistance;
+    slider.current.style.transform = `translate3d(${clampedDistance}px, 0px, 0px)`;
+    stateRef.current.velocity *= 0.9;
+
+    if (Math.abs(stateRef.current.velocity) > 0.1) {
+      stateRef.current.requestAnimationId =
+        requestAnimationFrame(momentumLoop);
+    }
   };
 
   useEffect(() => {
