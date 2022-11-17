@@ -11,13 +11,48 @@ const unsplashUrls = [
   'https://images.unsplash.com/photo-1548918901-9b31223c5c3a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1301&q=80',
 ];
 
+function clamp(value, lover, upper) {
+  if (value > upper) return upper;
+  if (value < lover) return lover;
+  return value;
+}
+
 function App() {
   const slider = useRef();
+  const stateRef = useRef({
+    hasMousePress: false,
+    startXPosition: 0,
+    transformAmount: 0,
+    velocity: 0,
+    requestAnimationId: 0,
+  });
 
-  const mouseDown = () => {};
-  const mouseLeave = () => {};
-  const mouseUp = () => {};
-  const mouseMove = () => {};
+  const mouseDown = (event) => {
+    stateRef.current.hasMousePress = true;
+    stateRef.current.startXPosition =
+      event.pageX - stateRef.current.transformAmount;
+  };
+  const mouseLeave = () => {
+    stateRef.current.hasMousePress = false;
+  };
+  const mouseUp = () => {
+    stateRef.current.hasMousePress = false;
+  };
+  const mouseMove = (event) => {
+    if (!stateRef.current.hasMousePress) return;
+
+    const { pageX } = event;
+    const distance = pageX - stateRef.current.startXPosition;
+    const clampedDistance = clamp(
+      distance,
+      -slider.current.scrollWidth + slider.current.clientWidth,
+      0
+    );
+    stateRef.current.velocity =
+      stateRef.current.transformAmount - clampedDistance;
+    stateRef.current.transformAmount = clampedDistance;
+    slider.current.style.transform = `translate3d(${clampedDistance}px, 0px, 0px)`;
+  };
 
   useEffect(() => {
     const sliderCopy = slider.current;
